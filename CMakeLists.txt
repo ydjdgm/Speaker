@@ -1,0 +1,20 @@
+cmake_minimum_required(VERSION 3.31)
+project(Speaker VERSION 1.0.0 LANGUAGES CXX)
+if(NOT WIN32 OR NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
+  message(FATAL_ERROR "Speaker requires Windows x64")
+endif()
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_AUTOMOC ON)
+find_package(Qt6 6.8.3 EXACT REQUIRED COMPONENTS Widgets)
+qt_add_executable(Speaker WIN32
+  src/main.cpp src/MainWindow.cpp src/MainWindow.h
+  src/AudioEngine.cpp src/AudioEngine.h src/Recorder.cpp src/Recorder.h)
+target_compile_definitions(Speaker PRIVATE UNICODE _UNICODE NOMINMAX WIN32_LEAN_AND_MEAN _WIN32_WINNT=0x0A00 WINVER=0x0A00 NTDDI_VERSION=0x0A00000B)
+target_link_libraries(Speaker PRIVATE Qt6::Widgets ole32 uuid avrt propsys shell32 mmdevapi)
+if(MSVC)
+  # Installed Korean MSVC emits this prefix; CMake's locale probe can misdecode it.
+  set(CMAKE_CL_SHOWINCLUDES_PREFIX "참고: 포함 파일: ")
+  target_compile_options(Speaker PRIVATE /W4 /permissive- /utf-8 /EHsc)
+endif()
+install(TARGETS Speaker RUNTIME DESTINATION .)

@@ -1,2 +1,5 @@
-*.[mM][dD]
-!README.md
+.tools/
+build/
+dist/
+*.user
+*.log

@@ -1,0 +1,28 @@
+Speaker 1.0.0 - third-party distribution notices
+
+Qt 6.8.3 (QtCore, QtGui, QtWidgets, Windows platform and image/style plugins,
+Korean Qt translations) is dynamically linked, unmodified, under LGPL-3.0.
+Copyright The Qt Company Ltd. and other contributors.
+Full license texts and third-party notices are in qtbase-6.8.3/.
+The official package SBOM is qtbase-6.8.3.spdx.json; it includes components
+not necessarily linked into this application.
+
+Matching library source archives are shipped under sources/ in the distribution.
+Original upstream sources:
+https://download.qt.io/archive/qt/6.8/6.8.3/submodules/qtbase-everywhere-src-6.8.3.zip
+https://download.qt.io/archive/qt/6.8/6.8.3/submodules/qttranslations-everywhere-src-6.8.3.zip
+https://doc.qt.io/qt-6.8/licensing.html
+
+You may replace the shared Qt DLLs and plugins with ABI-compatible modified
+versions. Reverse engineering for debugging modifications to these LGPL
+libraries is permitted. Preserve the platform plugin directory when replacing
+Qt. Qt source contains build instructions and licenses for bundled components.
+
+Microsoft Visual C++ 2022 Redistributable runtime DLLs are included app-local
+from the licensed Visual Studio Build Tools redistributable directory.
+They remain subject to the Microsoft redistribution terms in
+Microsoft-Visual-Studio-license.txt. Windows system libraries are not bundled.
+
+VB-CABLE is a separate third-party driver, not bundled or installed by Speaker.
+Obtain it directly from https://vb-audio.com/Cable/ and follow its license and
+installation requirements. Speaker does not change Windows default devices.

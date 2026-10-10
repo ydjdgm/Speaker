@@ -1,0 +1,22 @@
+{
+  "qt": "6.8.3",
+  "qtArchitecture": "msvc2022_64",
+  "msvcToolset": "14.44.35207",
+  "clVersion": "19.44.35229",
+  "windowsSdk": "10.0.26100.0",
+  "cmake": "3.31.6",
+  "ninjaPackage": "1.11.1.3",
+  "aqtinstall": "3.3.0",
+  "sourceArchives": [
+    {
+      "file": "qtbase-source.zip",
+      "bytes": 74010483,
+      "sha256": "992BF7766E214A341EF793EB3665FB784787D2FD666955F5F507F4C6F1F770DD"
+    },
+    {
+      "file": "qttranslations-source.zip",
+      "bytes": 3159682,
+      "sha256": "2A51D6D2A143B17FB0F9A0AC5FBAB67602A950447504EC8CB8E23DB12CCD3BEB"
+    }
+  ]
+}
