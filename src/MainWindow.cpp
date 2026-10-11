@@ -1,5 +1,10 @@
 #include "MainWindow.h"
 #include <QApplication>
+#include <QAction>
+#include <QMenu>
+#include <QMenuBar>
+#include <QStyle>
+#include <QSystemTrayIcon>
 #include <QAbstractButton>
 #include <QCheckBox>
 #include <QCloseEvent>
@@ -97,7 +102,7 @@ MainWindow::MainWindow() {
  config_.stable=settings_.value("audio/stable",false).toBool();
  folder_=settings_.value("recordings/folder",Recorder::defaultFolder()).toString();
  if(folder_.isEmpty()) folder_=Recorder::defaultFolder();
- buildUi(); refreshDevices(); refreshPrograms(); setSwitches(); updating_=false;
+ buildUi(); setupTray(); refreshDevices(); refreshPrograms(); setSwitches(); updating_=false;
  engine_.setRecordSink([this](const float* frames,size_t count){recorder_.push(frames,count);});
  const QString recovery=recorder_.recover(); refreshFiles();
  auto* timer=new QTimer(this); connect(timer,&QTimer::timeout,this,[this]{poll();}); timer->start(100);
@@ -278,8 +283,49 @@ void MainWindow::showGuide(){
  box.setText((found?QString("VB-CABLE 재생 장치가 감지되었습니다.\n\n"):QString("VB-CABLE이 감지되지 않았습니다. 설치 없이도 모니터링과 로컬 녹음은 가능합니다.\n\n"))+"1. 필요한 경우 공식 사이트에서 VB-CABLE을 설치하세요. 관리자 권한 승인과 재부팅이 필요할 수 있습니다.\n2. Speaker에서 장치 새로 고침 후 CABLE Input을 선택하세요.\n3. Discord / 게임 입력은 CABLE Output, 출력은 실제 이어폰으로 선택하세요.\n4. 전송 ON을 켜세요. 노이즈 억제와 자동 감도가 음악을 끊으면 통화 앱 설정을 조절하세요.\n\n전송 OFF 또는 앱 종료 후 Speaker의 소리는 전달되지 않습니다. 일반 마이크로 돌아가려면 통화 앱의 입력을 USB 마이크로 다시 선택하세요. Windows 기본 장치는 변경하지 않습니다.");
  auto* official=box.addButton("공식 VB-CABLE 사이트 열기",QMessageBox::ActionRole);box.addButton("닫기",QMessageBox::AcceptRole);box.exec();if(box.clickedButton()==official)QDesktopServices::openUrl(QUrl("https://vb-audio.com/Cable/"));
 }
+void MainWindow::setupTray(){
+ const QIcon icon=style()->standardIcon(QStyle::SP_MediaVolume);
+ setWindowIcon(icon);
+ auto* appMenu=menuBar()->addMenu("앱");
+ auto* quitAction=appMenu->addAction("완전히 종료");
+ connect(quitAction,&QAction::triggered,this,[this]{quitApplication();});
+ tray_=new QSystemTrayIcon(icon,this);
+ tray_->setToolTip("Speaker — X는 창만 숨깁니다. 완전히 종료하려면 우클릭하세요.");
+ auto* menu=new QMenu(this);
+ auto* open=menu->addAction("Speaker 열기");
+ connect(open,&QAction::triggered,this,[this]{restoreWindow();});
+ menu->addSeparator();menu->addAction(quitAction);
+ tray_->setContextMenu(menu);
+ connect(tray_,&QSystemTrayIcon::activated,this,[this](QSystemTrayIcon::ActivationReason reason){
+  if(reason==QSystemTrayIcon::Trigger||reason==QSystemTrayIcon::DoubleClick)restoreWindow();
+ });
+ tray_->show();
+}
+void MainWindow::restoreWindow(){
+ showNormal();raise();activateWindow();
+}
+void MainWindow::quitApplication(){
+ if(exitRequested_)return;
+ restoreWindow();
+ if(config_.transmit||config_.recording||config_.monitor){
+  if(!confirm(this,"Speaker 완전히 종료","전송과 내 목소리 듣기를 중지하고 녹음 파일을 마무리합니다.\nSpeaker를 완전히 종료할까요?"))return;
+ }
+ exitRequested_=true;
+ engine_.stop();recorder_.stop();saveSettings();tray_->hide();
+ QApplication::quit();
+}
 void MainWindow::closeEvent(QCloseEvent* event){
- if(config_.transmit||config_.recording){if(!confirm(this,"Speaker 종료","종료하면 전송과 내 목소리 듣기를 중지하고 녹음 파일을 마무리합니다. 계속하려면 창을 최소화하세요.\n종료할까요?")){event->ignore();return;}}
- engine_.stop();recorder_.stop();saveSettings();event->accept();
+ if(exitRequested_){event->accept();return;}
+ event->ignore();
+ if(QSystemTrayIcon::isSystemTrayAvailable()){
+  tray_->show();hide();
+  if(!trayNoticeShown_){
+   trayNoticeShown_=true;
+   tray_->showMessage("Speaker는 계속 실행 중입니다","전송·녹음·내 목소리 듣기는 유지됩니다. 트레이 아이콘을 누르면 창을 다시 열 수 있습니다. 우클릭 → 완전히 종료로 종료하세요.",QSystemTrayIcon::Information,5000);
+  }
+ }else{
+  message("시스템 트레이를 사용할 수 없어 최소화합니다. 기능은 계속 동작합니다. 종료하려면 앱 → 완전히 종료를 선택하세요.");
+  showMinimized();
+ }
 }
 }

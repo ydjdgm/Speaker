@@ -11,6 +11,7 @@ class QProgressBar;
 class QTableWidget;
 class QPushButton;
 class QCloseEvent;
+class QSystemTrayIcon;
 namespace speaker {
 class MainWindow final : public QMainWindow {
 public:
@@ -33,6 +34,12 @@ private:
  QProgressBar *microphoneMeter_, *programMeter_, *mixMeter_;
  QTableWidget* files_;
  bool updating_=true;
+ QSystemTrayIcon* tray_=nullptr;
+ bool trayNoticeShown_=false;
+ bool exitRequested_=false;
+ void setupTray();
+ void restoreWindow();
+ void quitApplication();
  QString lastRecorderError_;
  void buildUi();
  void refreshDevices();
