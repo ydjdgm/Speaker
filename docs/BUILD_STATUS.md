@@ -16,6 +16,8 @@
 
 ## 배포 정적 확인
 
+- DLL 누락 후속 수정: `build/Speaker.exe` 옆에도 Qt Core/Gui/Widgets, 플랫폼 플러그인, 한국어 번역, C++ 런타임을 배치했다. 이후 `scripts/build.ps1` 실행 시 자동 배치한다. `build` 런타임 PE 19개 정적 import 검사에서 미해결 의존성 0개, 배포 스크립트 구문 오류 0개. 앱 시작은 실행하지 않았으므로 사용자가 확인해야 한다.
+
 - 배포 ZIP 생성 성공. 실행 폴더와 빌드 산출물의 EXE SHA-256 일치.
 - 배포 PE 파일(EXE/DLL) 19개 import table 검사: 현재 Windows 시스템 DLL과 배포 DLL 기준 미해결 정적 의존성 0개.
 - 한국어 번역, qwindows 플랫폼 플러그인, C++ 런타임 포함 확인.

@@ -18,3 +18,4 @@ $env:VSLANG = '1033'
 if ($LASTEXITCODE -ne 0) { throw 'CMake configure failed.' }
 & $cmake --build "$root\build" --parallel
 if ($LASTEXITCODE -ne 0) { throw 'Compilation failed.' }
+& "$PSScriptRoot\deploy-runtime.ps1" -Destination "$root\build" -QtRoot $QtRoot
